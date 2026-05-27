@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block titulo %}{% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- MENU -->
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Início</a></li>
+                <li><a href="/cursos">Cursos</a></li>
+                <li><a href="/professores">Professores</a></li>
+                <li><a href="/contato">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main>
+        {% block conteudo %}
+        {% endblock %}
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer>
+        <p>© 2026 - Escola Técnica TechFuture</p>
+    </footer>
+
+</body>
+</html>
