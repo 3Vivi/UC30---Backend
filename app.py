@@ -1,79 +1,59 @@
-from flask import Flask, render_template
+from flask import (
+    Flask,
+    render_template,
+    session,
+    redirect,
+    url_for,
+    request,
+    flash
+)
 
 app = Flask(__name__)
+app.secret_key = "minha_chave_secreta"
 
-# Página inicial
+usuario_correto = "lidia"
+senha_correta = "1234"
+
+
 @app.route("/")
-def index():
-    return render_template("index.html")
+def inicio():
+    return render_template("inicio.html")
 
 
-# Cardápio
-@app.route("/cardapio")
-def cardapio():
-    return render_template("cardapio.html")
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+        usuario = request.form.get("usuario", "").strip().lower()
+        senha = request.form.get("senha")
+
+        if usuario == usuario_correto and senha == senha_correta:
+            session["usuario"] = usuario
+            return redirect(url_for("dashboard"))
+
+        flash("Usuário ou senha inválidos!")
+
+    return render_template("login.html")
 
 
-# Página dinâmica do lanche
-@app.route("/lanche/<nome>")
-def lanche(nome):
+@app.route("/dashboard")
+def dashboard():
 
-    mensagem = ""
+    if "usuario" not in session:
+        flash("Faça login para acessar o sistema!")
+        return redirect(url_for("login"))
 
-    if nome.lower() == "pizza":
-        mensagem = "Pizza deliciosa saindo do forno!"
-    elif nome.lower() == "sushi":
-        mensagem = "sushi fresquinho!"
-    elif nome.lower() == "batata":
-        mensagem = "Batata frita crocante e saborosa!"
-    elif nome.lower() == "milkshake":
-        mensagem = "Milkshake gelado e cremoso!"
-    else:
-        mensagem = "Lanche não encontrado."
+    usuario = session["usuario"]
+    return f"Login realizado com sucesso! Bem-vindo, {usuario}!"
 
-    return render_template(
-        "lanche.html",
-        nome=nome,
-        mensagem=mensagem
-    )
 
-# Página de pedidos
-@app.route("/pedidos")
-def pedidos():
-
-    pedidos = [
-        {"cliente": "Ana", "pedido": "Pizza", "valor": "R$ 35"},
-        {"cliente": "Pedro", "pedido": "Temaki hot", "valor": "R$ 14"},
-        {"cliente": "Carlos", "pedido": "Batata Frita", "valor": "R$ 20"},
-        {"cliente": "Julia", "pedido": "Milkshake", "valor": "R$ 18"}
-    ]
-
-    return render_template(
-        "pedidos.html",
-        pedidos=pedidos
-    )
-
-# Página dinâmica do cliente
-@app.route("/cliente/<nome>/<cidade>")
-def cliente(nome, cidade):
-
-    if cidade.lower() == "natal":
-        status = "Entrega disponível!"
-    else:
-        status = "Entrega indisponível."
-
-    return render_template(
-        "cliente.html",
-        nome=nome,
-        cidade=cidade,
-        status=status
-    )
-
-# Página contato
-@app.route("/contato")
-def contato():
-    return render_template("contato.html")
+@app.route("/logout")
+def logout():
+    session.pop("usuario", None)
+    flash("Você saiu do sistema!")
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
